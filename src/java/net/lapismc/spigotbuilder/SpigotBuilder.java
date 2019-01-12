@@ -53,11 +53,12 @@ class SpigotBuilder {
                 Manifest mf = jarStream.getManifest();
                 String version = mf.getMainAttributes().getValue("Implementation-Version");
                 String[] parts = version.substring("git-Spigot-".length()).split("-");
-                int spigotVersions = getDistance(parts[0]);
+                int spigotVersions = getDistance("spigot", parts[0]);
+                int craftBukkitVersions = getDistance("craftbukkit", parts[1]);
                 //If the difference is 0 we dont update
-                mustUpdate = spigotVersions != 0;
+                mustUpdate = !(spigotVersions == 0 && craftBukkitVersions == 0);
                 if (mustUpdate) {
-                    log("You are " + spigotVersions + " behind the latest Spigot version");
+                    log("You are " + (spigotVersions + craftBukkitVersions) + " version(s) behind the latest Spigot");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,7 +96,7 @@ class SpigotBuilder {
         pb.directory(buildDir);
         try {
             log("Starting BuildTools, all BuildTools output will not have time stamps");
-            Process process = startProcess(pb);
+            Process process = startProcess(pb, false);
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -135,31 +136,33 @@ class SpigotBuilder {
     private void startServer(File spigotJar) {
         try {
             ProcessBuilder pb = new ProcessBuilder("java", "-jar", spigotJar.getAbsolutePath());
-            startProcess(pb);
+            startProcess(pb, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private Process startProcess(ProcessBuilder pb) throws IOException {
+    private Process startProcess(ProcessBuilder pb, boolean allowInput) throws IOException {
         pb.redirectErrorStream(true);
         Process process = pb.start();
-        Thread thread = new Thread(() -> {
-            while (process.isAlive()) {
-                Scanner scanner = new Scanner(System.in);
-                while (scanner.hasNext()) {
-                    String input = scanner.next() + "\n";
-                    try {
-                        OutputStream out = process.getOutputStream();
-                        out.write(input.getBytes());
-                        out.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+        if (allowInput) {
+            Thread thread = new Thread(() -> {
+                while (process.isAlive()) {
+                    Scanner scanner = new Scanner(System.in);
+                    while (scanner.hasNext()) {
+                        String input = scanner.next() + "\n";
+                        try {
+                            OutputStream out = process.getOutputStream();
+                            out.write(input.getBytes());
+                            out.flush();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
-        });
-        thread.start();
+            });
+            thread.start();
+        }
         InputStream is = process.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String line;
@@ -169,8 +172,7 @@ class SpigotBuilder {
         return process;
     }
 
-    private int getDistance(String hash) {
-        String repo = "spigot";
+    private int getDistance(String repo, String hash) {
         try {
             //noinspection UnstableApiUsage
             try (BufferedReader reader = Resources.asCharSource(
