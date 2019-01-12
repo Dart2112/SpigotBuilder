@@ -59,6 +59,8 @@ class SpigotBuilder {
                 mustUpdate = !(spigotVersions == 0 && craftBukkitVersions == 0);
                 if (mustUpdate) {
                     log("You are " + (spigotVersions + craftBukkitVersions) + " version(s) behind the latest Spigot");
+                } else {
+                    log("You are on the latest version of Spigot");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -149,8 +151,8 @@ class SpigotBuilder {
             Thread thread = new Thread(() -> {
                 while (process.isAlive()) {
                     Scanner scanner = new Scanner(System.in);
-                    while (scanner.hasNext()) {
-                        String input = scanner.next() + "\n";
+                    while (scanner.hasNextLine()) {
+                        String input = scanner.nextLine() + "\n";
                         try {
                             OutputStream out = process.getOutputStream();
                             out.write(input.getBytes());
