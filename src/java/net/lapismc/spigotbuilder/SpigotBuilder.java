@@ -25,7 +25,7 @@ class SpigotBuilder {
     SpigotBuilder() {
         log("Starting SpigotBuilder");
         //Create build directory if non-existent
-        File buildDir = new File("./Build");
+        File buildDir = new File("./build");
         if (!buildDir.exists()) {
             buildDir.mkdir();
         }
@@ -72,7 +72,7 @@ class SpigotBuilder {
     private void runBuildTools(File buildDir, File currentSpigotJar) {
         //Run build tools and copy result into server
         //Check if build tools exists
-        File buildJar = new File("./Build" + File.separator + "BuildTools.jar");
+        File buildJar = new File("./build" + File.separator + "BuildTools.jar");
         if (!buildJar.exists()) {
             try {
                 buildJar.createNewFile();
