@@ -229,7 +229,7 @@ class SpigotBuilder {
     private File getCompiledJar(File buildDir) {
         File newSpigotJar = null;
         for (File f : Objects.requireNonNull(buildDir.listFiles())) {
-            if (!f.isDirectory() | f.getName().startsWith("spigot-")) {
+            if (!f.isDirectory() && f.getName().startsWith("spigot-") && f.getName().endsWith(".jar")) {
                 newSpigotJar = f;
             }
         }
@@ -245,6 +245,8 @@ class SpigotBuilder {
                 if (!version.startsWith("git-Spigot-")) {
                     return false;
                 }
+            } else {
+                return false;
             }
             FileUtils.copyFile(source, dest);
             return true;
