@@ -45,7 +45,8 @@ class SpigotBuilder {
         placeEula();
         log("Starting the server");
         startServer(currentSpigotJar);
-        buildTools.destroyForcibly();
+        if (buildTools != null && buildTools.isAlive())
+            buildTools.destroyForcibly();
         System.exit(0);
     }
 
