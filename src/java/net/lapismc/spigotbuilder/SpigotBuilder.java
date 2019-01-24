@@ -22,6 +22,9 @@ import java.util.jar.Manifest;
 
 class SpigotBuilder {
 
+    private Process buildTools;
+    private boolean showBuildTools = false;
+
     SpigotBuilder() {
         log("Starting SpigotBuilder");
         //Create build directory if non-existent
@@ -42,6 +45,7 @@ class SpigotBuilder {
         placeEula();
         log("Starting the server");
         startServer(currentSpigotJar);
+        buildTools.destroyForcibly();
         System.exit(0);
     }
 
@@ -104,7 +108,7 @@ class SpigotBuilder {
             e.printStackTrace();
         }
         //Run build tools and wait for it to complete
-        ProcessBuilder pb = new ProcessBuilder("java", "-jar", buildJar.getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder("java", "-Xmx512M", "-jar", buildJar.getAbsolutePath());
         pb.directory(buildDir);
         try {
             if (background) {
@@ -112,14 +116,14 @@ class SpigotBuilder {
             } else {
                 log("Starting BuildTools, all BuildTools output will not have time stamps");
             }
-            Process process = startProcess(pb, false, !background);
+            buildTools = startProcess(pb, false, !background);
             if (!background) {
-                process.waitFor();
+                buildTools.waitFor();
             } else {
                 new Thread(() -> {
                     try {
-                        while (process.isAlive()) {
-                            Thread.sleep(100);
+                        while (buildTools.isAlive()) {
+                            Thread.sleep(1000);
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -128,6 +132,25 @@ class SpigotBuilder {
                         log("Update downloaded, it will be installed the next time the server starts");
                     } else {
                         log("The jar file could not be installed, this may be because build tools failed or because the destination file is in use");
+                    }
+                }).start();
+            }
+            if (background) {
+                new Thread(() -> {
+                    try {
+                        while (buildTools.isAlive()) {
+                            if (showBuildTools) {
+                                InputStream is = buildTools.getInputStream();
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                                String line;
+                                while ((line = reader.readLine()) != null && showBuildTools) {
+                                    System.out.println(line);
+                                }
+                            }
+                            Thread.sleep(1000);
+                        }
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }).start();
             }
@@ -176,6 +199,7 @@ class SpigotBuilder {
     }
 
     private Process startProcess(ProcessBuilder pb, boolean allowInput, boolean showOutput) throws IOException {
+        pb.redirectErrorStream(true);
         Process process = pb.start();
         if (allowInput) {
             Thread thread = new Thread(() -> {
@@ -183,12 +207,16 @@ class SpigotBuilder {
                     Scanner scanner = new Scanner(System.in);
                     while (scanner.hasNextLine()) {
                         String input = scanner.nextLine() + "\n";
-                        try {
-                            OutputStream out = process.getOutputStream();
-                            out.write(input.getBytes());
-                            out.flush();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (input.toLowerCase().startsWith("togglebuildtools") || input.toLowerCase().startsWith("tbt")) {
+                            showBuildTools = !showBuildTools;
+                        } else {
+                            try {
+                                OutputStream out = process.getOutputStream();
+                                out.write(input.getBytes());
+                                out.flush();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -196,7 +224,6 @@ class SpigotBuilder {
             thread.start();
         }
         if (showOutput) {
-            pb.redirectErrorStream(true);
             InputStream is = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
