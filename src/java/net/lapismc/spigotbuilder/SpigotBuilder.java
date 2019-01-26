@@ -59,8 +59,14 @@ class SpigotBuilder {
     private int mustUpdate(File currentSpigotJar) {
         File updatedJar = new File("./Spigot-UPDATED");
         if (updatedJar.exists()) {
-            updatedJar.renameTo(currentSpigotJar);
-            log("Update installed!");
+            try {
+                FileUtils.deleteQuietly(currentSpigotJar);
+                FileUtils.moveFile(updatedJar, currentSpigotJar);
+                FileUtils.deleteQuietly(updatedJar);
+                log("Previously compiled update installed!");
+            } catch (IOException e) {
+                log("Failed to install update");
+            }
             return 0;
         }
         int mustUpdate = 0;
@@ -139,7 +145,15 @@ class SpigotBuilder {
             if (background) {
                 new Thread(() -> {
                     try {
+                        int i = 0;
                         while (buildTools.isAlive()) {
+                            i++;
+                            if (i >= 30) {
+                                if (!showBuildTools)
+                                    log("Build tools is still running, stopping the server will terminate BuildTools" +
+                                            ", use tbt or togglebuildtools to show the output");
+                                i = 0;
+                            }
                             if (showBuildTools) {
                                 InputStream is = buildTools.getInputStream();
                                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
