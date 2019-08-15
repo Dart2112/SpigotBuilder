@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import sun.jvm.hotspot.debugger.posix.elf.ELFSectionHeader;
 
 import java.io.*;
 import java.net.URL;
@@ -25,7 +26,7 @@ class SpigotBuilder {
     private Process buildTools;
     private boolean showBuildTools = false;
 
-    SpigotBuilder() {
+    SpigotBuilder(String version, boolean update) {
         log("Starting SpigotBuilder");
         //Create build directory if non-existent
         File buildDir = new File("./build");
@@ -34,12 +35,12 @@ class SpigotBuilder {
         }
         //Check if we have the latest version
         File currentSpigotJar = new File("./Spigot.jar");
-        log("Checking for updates to Spigot");
+        log("Checking for Spigot version");
         int mustUpdate = mustUpdate(currentSpigotJar);
-        if (mustUpdate != 0) {
-            log("Compiling the latest version");
+        if (mustUpdate == 2 && update || mustUpdate == 1) {
+            log("Compiling new Spigot jar");
             //Run build tools if we dont have the latest version
-            runBuildTools(buildDir, currentSpigotJar, mustUpdate == 2);
+            runBuildTools(buildDir, currentSpigotJar, version, mustUpdate == 2);
         }
         //Set EULA file before starting the server
         placeEula();
@@ -54,7 +55,8 @@ class SpigotBuilder {
      * Check for an update to Spigot
      *
      * @param currentSpigotJar The current jar file for spigot
-     * @return Returns 0 if there is no update, 1 if there isn't a valid jar, 2 if the update could be downloaded in the background
+     * @return Returns 0 if there is no update, 1 if there isn't a valid jar, 2 if the update could be
+     * downloaded in the background
      */
     private int mustUpdate(File currentSpigotJar) {
         File updatedJar = new File("./Spigot-UPDATED");
@@ -93,7 +95,7 @@ class SpigotBuilder {
         return mustUpdate;
     }
 
-    private void runBuildTools(File buildDir, File currentSpigotJar, boolean background) {
+    private void runBuildTools(File buildDir, File currentSpigotJar, String version, boolean background) {
         //Run build tools and copy result into server
         //Check if build tools exists
         File buildJar = new File("./build" + File.separator + "BuildTools.jar");
@@ -107,7 +109,8 @@ class SpigotBuilder {
         //Always download the latest build tools
         try {
             //Download the jar file
-            URL website = new URL("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar");
+            URL website = new URL("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild" +
+                    "/artifact/target/BuildTools.jar");
             ReadableByteChannel rbc = Channels.newChannel(website.openStream());
             FileOutputStream fos = new FileOutputStream(buildJar);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
@@ -115,7 +118,15 @@ class SpigotBuilder {
             e.printStackTrace();
         }
         //Run build tools and wait for it to complete
-        ProcessBuilder pb = new ProcessBuilder("java", "-Xmx512M", "-jar", buildJar.getAbsolutePath());
+        ProcessBuilder pb;
+        if (version.equals("")) {
+            pb = new ProcessBuilder("java", "-Xmx512M", "-jar",
+                    buildJar.getAbsolutePath());
+        } else {
+            pb = new ProcessBuilder("java", "-Xmx512M", "-jar",
+                    buildJar.getAbsolutePath(), "--rev", version);
+        }
+
         pb.directory(buildDir);
         try {
             if (background) {
@@ -138,7 +149,8 @@ class SpigotBuilder {
                     if (copyFile(getCompiledJar(buildDir), new File("./Spigot-UPDATED"))) {
                         log("Update downloaded, it will be installed the next time the server starts");
                     } else {
-                        log("The jar file could not be installed, this may be because build tools failed or because the destination file is in use");
+                        log("The jar file could not be installed, this may be because build tools failed" +
+                                " or because the destination file is in use");
                     }
                 }).start();
             }
@@ -179,7 +191,8 @@ class SpigotBuilder {
             if (copyFile(getCompiledJar(buildDir), currentSpigotJar)) {
                 log("Jar file installed");
             } else {
-                log("The jar file could not be installed, this may be because build tools failed or because the destination file is in use");
+                log("The jar file could not be installed, this may be because build tools failed or because" +
+                        " the destination file is in use");
             }
         }
     }
@@ -222,7 +235,8 @@ class SpigotBuilder {
                     Scanner scanner = new Scanner(System.in);
                     while (scanner.hasNextLine()) {
                         String input = scanner.nextLine() + "\n";
-                        if (input.toLowerCase().startsWith("togglebuildtools") || input.toLowerCase().startsWith("tbt")) {
+                        if (input.toLowerCase().startsWith("togglebuildtools") ||
+                                input.toLowerCase().startsWith("tbt")) {
                             showBuildTools = !showBuildTools;
                         } else {
                             try {
