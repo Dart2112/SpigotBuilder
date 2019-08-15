@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import sun.jvm.hotspot.debugger.posix.elf.ELFSectionHeader;
 
 import java.io.*;
 import java.net.URL;
@@ -14,6 +13,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -41,6 +41,9 @@ class SpigotBuilder {
             log("Compiling new Spigot jar");
             //Run build tools if we dont have the latest version
             runBuildTools(buildDir, currentSpigotJar, version, mustUpdate == 2);
+        } else if (!update) {
+            log("Update is disabled, starting server");
+            log("set second argument to true or remove it to update");
         }
         //Set EULA file before starting the server
         placeEula();
@@ -268,7 +271,7 @@ class SpigotBuilder {
             //noinspection UnstableApiUsage
             try (BufferedReader reader = Resources.asCharSource(
                     new URL("https://hub.spigotmc.org/stash/rest/api/1.0/projects/SPIGOT/repos/" + repo +
-                            "/commits?since=" + URLEncoder.encode(hash, "UTF-8") + "&withCounts=true"),
+                            "/commits?since=" + URLEncoder.encode(hash, StandardCharsets.UTF_8) + "&withCounts=true"),
                     Charsets.UTF_8).openBufferedStream()) {
                 JSONObject obj = (JSONObject) new JSONParser().parse(reader);
                 return ((Number) obj.get("totalCount")).intValue();
