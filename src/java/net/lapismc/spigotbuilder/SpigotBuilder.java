@@ -271,7 +271,7 @@ class SpigotBuilder {
             //noinspection UnstableApiUsage
             try (BufferedReader reader = Resources.asCharSource(
                     new URL("https://hub.spigotmc.org/stash/rest/api/1.0/projects/SPIGOT/repos/" + repo +
-                            "/commits?since=" + URLEncoder.encode(hash, StandardCharsets.UTF_8) + "&withCounts=true"),
+                            "/commits?since=" + URLEncoder.encode(hash, StandardCharsets.UTF_8.toString()) + "&withCounts=true"),
                     Charsets.UTF_8).openBufferedStream()) {
                 JSONObject obj = (JSONObject) new JSONParser().parse(reader);
                 return ((Number) obj.get("totalCount")).intValue();
