@@ -222,7 +222,8 @@ class SpigotBuilder {
 
     private void startServer(File spigotJar) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("java", "-jar", spigotJar.getAbsolutePath());
+            //Start the server without the vanilla GUI
+            ProcessBuilder pb = new ProcessBuilder("java", "-jar", spigotJar.getAbsolutePath(), "--nogui");
             startProcess(pb, true, true);
         } catch (IOException e) {
             e.printStackTrace();

@@ -62,21 +62,33 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="418" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1579417522049" />
-    <state width="1878" height="277" key="GridCell.Tab.0.bottom" timestamp="1579417586193">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="2488" y="121" width="774" height="801" key="CommitChangelistDialog2" timestamp="1579763987349">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2488" y="121" width="774" height="801" key="CommitChangelistDialog2/0.0.1920.1050/1920.0.1920.1080@1920.0.1920.1080" timestamp="1579763987349" />
+    <state width="1878" height="279" key="GridCell.Tab.0.bottom" timestamp="1579764001116">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1878" height="277" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1579417586192" />
-    <state width="1878" height="277" key="GridCell.Tab.0.center" timestamp="1579417586192">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1050/1920.0.1920.1080@1920.0.1920.1080" timestamp="1579764001116" />
+    <state width="1878" height="279" key="GridCell.Tab.0.center" timestamp="1579764001115">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1878" height="277" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1579417586192" />
-    <state width="1878" height="277" key="GridCell.Tab.0.left" timestamp="1579417586191">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="279" key="GridCell.Tab.0.center/0.0.1920.1050/1920.0.1920.1080@1920.0.1920.1080" timestamp="1579764001115" />
+    <state width="1878" height="279" key="GridCell.Tab.0.left" timestamp="1579764001115">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1878" height="277" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1579417586191" />
-    <state width="1878" height="277" key="GridCell.Tab.0.right" timestamp="1579417586192">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="279" key="GridCell.Tab.0.left/0.0.1920.1050/1920.0.1920.1080@1920.0.1920.1080" timestamp="1579764001115" />
+    <state width="1878" height="279" key="GridCell.Tab.0.right" timestamp="1579764001115">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1878" height="277" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1579417586192" />
+    <state width="1878" height="279" key="GridCell.Tab.0.right/0.0.1920.1050/1920.0.1920.1080@1920.0.1920.1080" timestamp="1579764001115" />
+    <state x="2582" y="318" width="595" height="406" key="git4idea.merge.GitPullDialog" timestamp="1579763958620">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2582" y="318" width="595" height="406" key="git4idea.merge.GitPullDialog/0.0.1920.1050/1920.0.1920.1080@1920.0.1920.1080" timestamp="1579763958620" />
   </component>
 </project>
